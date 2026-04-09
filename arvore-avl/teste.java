@@ -1,4 +1,4 @@
-package ArvoreBinaria;
+
 
 public class teste {
     public static void main(String[] args) {

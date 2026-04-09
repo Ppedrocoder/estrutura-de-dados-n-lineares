@@ -1,4 +1,4 @@
-package ArvoreBinaria;
+
 
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -6,8 +6,8 @@ import static java.lang.Math.max;
 import java.util.List;
 
 public class ArvoreBinaria {
-    private No root;
-    private int size;
+    protected No root;
+    protected int size;
     public ArvoreBinaria() {
         this.root = null;
         this.size = 0;
@@ -232,7 +232,7 @@ public class ArvoreBinaria {
 
         for (int i = 0; i < linhas; i++)
             for (int j = 0; j < colunas; j++)
-                matriz[i][j] = "   ";
+                matriz[i][j] = "      ";
 
         preencherMatriz(raiz, matriz, 0, colunas / 2, altura);
 
@@ -242,7 +242,7 @@ public class ArvoreBinaria {
             System.out.println();
         }
     }
-    private void preencherMatriz(No no, String[][] matriz, int nivel, int coluna, int alturaRestante) {
+    protected void preencherMatriz(No no, String[][] matriz, int nivel, int coluna, int alturaRestante) {
         if (no == null) return;
 
         matriz[nivel][coluna] = String.format("%3s", no.getElement());

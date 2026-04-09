@@ -1,23 +1,22 @@
-import ArvoreBinaria.No;
 
 public class NoAVL extends No {
     private int FB;
     public NoAVL() {
         super();
-        FB = 0;
+        this.FB = 0;
     }
-    public NoAVL(NoAVL Parent,Object element) {
+    public NoAVL(No Parent,Object element) {
         super(Parent,element);
-        FB = 0;
+        this.FB = 0;
     }
-    public NoAVL(NoAVL Parent) {
+    public NoAVL(No Parent) {
         super(Parent);
-        FB = 0;
+        this.FB = 0;
     }
-    public void setBalanceFactor(int FB) {
+    public void setFB(int FB) {
         this.FB = FB;
     }
-    public int getBalanceFactor() {
+    public int getFB() {
         return FB;
     }
 

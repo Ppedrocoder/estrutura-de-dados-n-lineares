@@ -1,4 +1,3 @@
-package ArvoreBinaria;
 
 public class No {
     private Object element;
