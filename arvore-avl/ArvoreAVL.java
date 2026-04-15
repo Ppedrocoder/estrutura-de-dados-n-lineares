@@ -19,97 +19,97 @@ public class ArvoreAVL extends ArvoreBinaria {
     }
     private NoAVL girarEsquerda(NoAVL z) {
         NoAVL paiOriginal = (NoAVL) z.getParent();
-        NoAVL x = (NoAVL) z.getRightChild();
-        z.setRightChild(x.getLeftChild());
-        x.setLeftChild(z);
-        x.setParent(paiOriginal);
-        return x;
+        NoAVL irmaoDireito = (NoAVL) z.getRightChild();
+        z.setRightChild(irmaoDireito.getLeftChild());
+        irmaoDireito.setLeftChild(z);
+        irmaoDireito.setParent(paiOriginal);
+        return irmaoDireito;
     }
     private NoAVL girarDireita(NoAVL z) {
         NoAVL paiOriginal = (NoAVL) z.getParent();
-        NoAVL x = (NoAVL) z.getLeftChild();
-        z.setLeftChild(x.getRightChild());
-        x.setRightChild(z);
-        x.setParent(paiOriginal);
-        return x;
+        NoAVL filhoEsquerdo = (NoAVL) z.getLeftChild();
+        z.setLeftChild(filhoEsquerdo.getRightChild());
+        filhoEsquerdo.setRightChild(z);
+        filhoEsquerdo.setParent(paiOriginal);
+        return filhoEsquerdo;
     }
     private NoAVL rotacaoEsquerda(NoAVL z) {
-        NoAVL y = (NoAVL) z.getRightChild();
-        int fyAnt = y.getFB();
+        NoAVL fihoDireito = (NoAVL) z.getRightChild();
+        int fbFDAnt = fihoDireito.getFB();
         NoAVL novaRaiz = girarEsquerda(z);
-        if (fyAnt == -1) {
-            z.setFB(0);  y.setFB(0);
-        } else { // fyAnt == 0
-            z.setFB(-1); y.setFB(1);
+        if (fbFDAnt == -1) {
+            z.setFB(0);  fihoDireito.setFB(0);
+        } else { // fbFDAnt == 0
+            z.setFB(-1); fihoDireito.setFB(1);
         }
         return novaRaiz;
     }
     private NoAVL rotacaoDireita(NoAVL z) {
-        NoAVL y = (NoAVL) z.getLeftChild();
-        int fyAnt = y.getFB();
+        NoAVL filhoEsquerdo = (NoAVL) z.getLeftChild();
+        int fbFEAnt = filhoEsquerdo.getFB();
         NoAVL novaRaiz = girarDireita(z);
-        if (fyAnt == 1) {
-            z.setFB(0);  y.setFB(0);
-        } else { // fyAnt == 0
-            z.setFB(1);  y.setFB(-1);
+        if (fbFEAnt == 1) {
+            z.setFB(0);  filhoEsquerdo.setFB(0);
+        } else { // fbFEAnt == 0
+            z.setFB(1);  filhoEsquerdo.setFB(-1);
         }
         return novaRaiz;
     }
     private NoAVL rotacaoDuplaDireita(NoAVL z) {
-        NoAVL y = (NoAVL) z.getLeftChild();
-        NoAVL x = (NoAVL) y.getRightChild();
-        int fxAnt = x.getFB(); // salvo ANTES de qualquer giro
+        NoAVL filhoEsquerdo = (NoAVL) z.getLeftChild();
+        NoAVL sobrinhoDireito = (NoAVL) filhoEsquerdo.getRightChild();
+        int fbSDAnt = sobrinhoDireito.getFB(); // salvo ANTES de qualquer giro
 
-        NoAVL novoEsq = girarEsquerda(y);
+        NoAVL novoEsq = girarEsquerda(filhoEsquerdo);
         novoEsq.setParent(z);
         z.setLeftChild(novoEsq);
         NoAVL novaRaiz = girarDireita(z);
 
-        if (fxAnt > 0) {        // fxAnt == 1
-            z.setFB(-1); y.setFB(0);
-        } else if (fxAnt < 0) { // fxAnt == -1
-            z.setFB(0);  y.setFB(1);
-        } else {                 // fxAnt == 0
-            z.setFB(0);  y.setFB(0);
+        if (fbSDAnt > 0) {        // fbSDAnt == 1
+            z.setFB(-1); sobrinhoDireito.setFB(0);
+        } else if (fbSDAnt < 0) { // fbSDAnt == -1
+            z.setFB(0);  sobrinhoDireito.setFB(1);
+        } else {                 // fbSDAnt == 0
+            z.setFB(0);  sobrinhoDireito.setFB(0);
         }
-        x.setFB(0);
+        sobrinhoDireito.setFB(0);
 
         return novaRaiz;
     }
 
     private NoAVL rotacaoDuplaEsquerda(NoAVL z) {
-        NoAVL y = (NoAVL) z.getRightChild();
-        NoAVL x = (NoAVL) y.getLeftChild();
-        int fxAnt = x.getFB(); // salvo ANTES de qualquer giro
+        NoAVL filhoDireito = (NoAVL) z.getRightChild();
+        NoAVL sobrinhoEsquerdo = (NoAVL) filhoDireito.getLeftChild();
+        int fbSEAnt = sobrinhoEsquerdo.getFB(); // salvo ANTES de qualquer giro
 
-        NoAVL novoDir = girarDireita(y);
+        NoAVL novoDir = girarDireita(filhoDireito);
         novoDir.setParent(z);
         z.setRightChild(novoDir);
         NoAVL novaRaiz = girarEsquerda(z);
 
-        if (fxAnt > 0) {        // fxAnt == 1
-            z.setFB(0);  y.setFB(-1);
-        } else if (fxAnt < 0) { // fxAnt == -1
-            z.setFB(1);  y.setFB(0);
-        } else {                 // fxAnt == 0
-            z.setFB(0);  y.setFB(0);
+        if (fbSEAnt > 0) {        // fbSEAnt == 1
+            z.setFB(0);  sobrinhoEsquerdo.setFB(-1);
+        } else if (fbSEAnt < 0) { // fbSEAnt == -1
+            z.setFB(1);  sobrinhoEsquerdo.setFB(0);
+        } else {                 // fbSEAnt == 0
+            z.setFB(0);  sobrinhoEsquerdo.setFB(0);
         }
-        x.setFB(0);
+        sobrinhoEsquerdo.setFB(0);
 
         return novaRaiz;
     }
 
     private NoAVL rebalance(NoAVL z) {
         if (z.getFB() == 2) {
-            NoAVL y = (NoAVL) z.getLeftChild();
-            if (y.getFB() >= 0) {
+            NoAVL filhoEsquerdo = (NoAVL) z.getLeftChild();
+            if (filhoEsquerdo.getFB() >= 0) {
                 z = rotacaoDireita(z);      // RDS
             } else {
                 z = rotacaoDuplaDireita(z); // RDD
             }
         } else if (z.getFB() == -2) {
-            NoAVL y = (NoAVL) z.getRightChild();
-            if (y.getFB() <= 0) {
+            NoAVL filhoDireito = (NoAVL) z.getRightChild();
+            if (filhoDireito.getFB() <= 0) {
                 z = rotacaoEsquerda(z);     // RES
             } else {
                 z = rotacaoDuplaEsquerda(z);// RDE
@@ -165,9 +165,9 @@ public class ArvoreAVL extends ArvoreBinaria {
         }
     }
 
-    private void atualizarFBRemocao(NoAVL n, int delta) {
+    private void atualizarFBRemocao(NoAVL n, int variacao) {
         while (n != null) {
-            n.setFB(n.getFB() + delta);
+            n.setFB(n.getFB() + variacao);
 
             // FB == +-1: altura nao mudou, para
             if (n.getFB() == 1 || n.getFB() == -1) break;
@@ -183,7 +183,11 @@ public class ArvoreAVL extends ArvoreBinaria {
             // FB == 0: altura diminuiu, sobe
             NoAVL parent = (NoAVL) n.getParent();
             if (parent == null) break;
-            delta = (n == parent.getLeftChild()) ? -1 : 1;
+            if (n == parent.getLeftChild()) {
+                variacao = -1;
+            } else {
+                variacao = 1;
+            }
             n = parent;
         }
     }
@@ -204,24 +208,22 @@ public class ArvoreAVL extends ArvoreBinaria {
 
         // Casos 2 e 3: 0 ou 1 filho
         NoAVL pai   = (NoAVL) node.getParent();
-        NoAVL filho = (node.getLeftChild() != null)
-                    ? (NoAVL) node.getLeftChild()
-                    : (NoAVL) node.getRightChild();
+        NoAVL filho = (node.getLeftChild() != null) ? (NoAVL) node.getLeftChild() : (NoAVL) node.getRightChild();
 
         if (filho != null) filho.setParent(pai);
 
         if (pai == null) {
             root = filho;
         } else {
-            int delta;
+            int variacao;
             if (node == pai.getLeftChild()) {
                 pai.setLeftChild(filho);
-                delta = -1;
+                variacao = -1;
             } else {
                 pai.setRightChild(filho);
-                delta = 1;
+                variacao = 1;
             }
-            atualizarFBRemocao(pai, delta);
+            atualizarFBRemocao(pai, variacao);
         }
         size--;
     }
