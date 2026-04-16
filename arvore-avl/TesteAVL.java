@@ -26,7 +26,6 @@ public class TesteAVL {
         verificarAVL((NoAVL) avl.root());
     }
 
-    // 🔍 Verificador de AVL
     public static int verificarAVL(NoAVL no) {
         if (no == null) return -1;
 
@@ -36,13 +35,13 @@ public class TesteAVL {
         int fbCalculado = hEsq - hDir;
 
         if (fbCalculado != no.getFB()) {
-            System.out.println("❌ ERRO FB no nó " + no.getElement() +
+            System.out.println("ERRO FB no nó " + no.getElement() +
                     " | FB armazenado: " + no.getFB() +
                     " | FB real: " + fbCalculado);
         }
 
         if (Math.abs(fbCalculado) > 1) {
-            System.out.println("❌ DESBALANCEADO no nó " + no.getElement());
+            System.out.println("DESBALANCEADO no nó " + no.getElement());
         }
 
         return 1 + Math.max(hEsq, hDir);
