@@ -27,10 +27,6 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
         } else {
             paiInicial.setRightChild(subAD);
         }
-        int FBN_novo = no.getAn() + 1 - Math.min(subAD.getAn(), 0);
-        int FBA_novo = subAD.getAn() + 1 + Math.max(FBN_novo, 0);
-        no.setAn(FBN_novo);
-        subAD.setAn(FBA_novo);
         return subAD;
     }
 
@@ -48,10 +44,6 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
         } else {
             paiInicial.setLeftChild(subAE);
         }
-        int FBN_novo = no.getAn() - 1 - Math.max(subAE.getAn(), 0);
-        int FBA_novo = subAE.getAn() - 1 + Math.min(FBN_novo, 0);
-        no.setAn(FBN_novo);
-        subAE.setAn(FBA_novo);
         return subAE;
     }
 
