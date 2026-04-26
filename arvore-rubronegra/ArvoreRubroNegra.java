@@ -4,7 +4,7 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
     }
 
     private boolean isRed(NoRN no) {
-        return no != null && "V".equals(no.getColor());
+        return "V".equals(getColor(no));
     }
 
     private void setColor(NoRN no, String color) {
@@ -13,9 +13,51 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
         }
     }
 
+    private String getColor(NoRN no) {
+        if (no == null) {
+            return "P";
+        }
+        return no.getColor();
+    }
+
+    private NoRN getLeftNo(NoRN no) {
+        if (no == null) {
+            return null;
+        }
+        return (NoRN) no.getLeftChild();
+    }
+
+    private NoRN getRightNo(NoRN no) {
+        if (no == null) {
+            return null;
+        }
+        return (NoRN) no.getRightChild();
+    }
+
+    private void transplantar(NoRN noOrigem, NoRN noDestino) {
+        NoRN pai = (NoRN) noOrigem.getParent();
+        if (pai == null) {
+            root = noDestino;
+            if (noDestino != null) {
+                noDestino.setParent(null);
+            }
+        } else if (noOrigem == pai.getLeftChild()) {
+            pai.setLeftChild(noDestino);
+        } else {
+            pai.setRightChild(noDestino);
+        }
+    }
+
+    public NoRN getMin(No no) {
+        NoRN current = (NoRN) no;
+        while (getLeftNo(current) != null) {
+            current = getLeftNo(current);
+        }
+        return current;
+    }
     public NoRN RSE(NoRN no){
-        NoRN subAD = (NoRN) no.getRightChild();
-        NoRN subAE = (NoRN) subAD.getLeftChild();
+        NoRN subAD = getRightNo(no);
+        NoRN subAE = getLeftNo(subAD);
         NoRN paiInicial = (NoRN) no.getParent();
         subAD.setLeftChild(no);
         no.setRightChild(subAE);
@@ -31,8 +73,8 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
     }
 
     public NoRN RSD(NoRN no){
-        NoRN subAE = (NoRN) no.getLeftChild();
-        NoRN subAD = (NoRN) subAE.getRightChild();
+        NoRN subAE = getLeftNo(no);
+        NoRN subAD = getRightNo(subAE);
         NoRN paiInicial = (NoRN) no.getParent();
         subAE.setRightChild(no);
         no.setLeftChild(subAD);
@@ -48,12 +90,12 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
     }
 
     public NoRN RDE(NoRN no){
-        no.setRightChild(RSD((NoRN) no.getRightChild()));
+        no.setRightChild(RSD(getRightNo(no)));
         return RSE(no);
     }
 
     public NoRN RDD(NoRN no){
-        no.setLeftChild(RSE((NoRN) no.getLeftChild()));
+        no.setLeftChild(RSE(getLeftNo(no)));
         return RSD(no);
     }
 
@@ -67,7 +109,7 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
             }
 
             if (pai == avo.getLeftChild()) {
-                NoRN tio = (NoRN) avo.getRightChild();
+                NoRN tio = getRightNo(avo);
 
                 if (isRed(tio)) {
                     setColor(pai, "P");
@@ -79,20 +121,20 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
                         RDD(avo);
                         NoRN novoTopo = (NoRN) avo.getParent();
                         setColor(novoTopo, "P");
-                        setColor((NoRN) novoTopo.getLeftChild(), "V");
-                        setColor((NoRN) novoTopo.getRightChild(), "V");
+                        setColor(getLeftNo(novoTopo), "V");
+                        setColor(getRightNo(novoTopo), "V");
                         n = novoTopo;
                     } else {
                         RSD(avo);
                         NoRN novoTopo = (NoRN) avo.getParent();
                         setColor(novoTopo, "P");
-                        setColor((NoRN) novoTopo.getLeftChild(), "V");
-                        setColor((NoRN) novoTopo.getRightChild(), "V");
+                        setColor(getLeftNo(novoTopo), "V");
+                        setColor(getRightNo(novoTopo), "V");
                         n = novoTopo;
                     }
                 }
             } else {
-                NoRN tio = (NoRN) avo.getLeftChild();
+                NoRN tio = getLeftNo(avo);
 
                 if (isRed(tio)) {
                     setColor(pai, "P");
@@ -104,15 +146,15 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
                         RDE(avo);
                         NoRN novoTopo = (NoRN) avo.getParent();
                         setColor(novoTopo, "P");
-                        setColor((NoRN) novoTopo.getLeftChild(), "V");
-                        setColor((NoRN) novoTopo.getRightChild(), "V");
+                        setColor(getLeftNo(novoTopo), "V");
+                        setColor(getRightNo(novoTopo), "V");
                         n = novoTopo;
                     } else {
                         RSE(avo);
                         NoRN novoTopo = (NoRN) avo.getParent();
                         setColor(novoTopo, "P");
-                        setColor((NoRN) novoTopo.getLeftChild(), "V");
-                        setColor((NoRN) novoTopo.getRightChild(), "V");
+                        setColor(getLeftNo(novoTopo), "V");
+                        setColor(getRightNo(novoTopo), "V");
                         n = novoTopo;
                     }
                 }
@@ -138,9 +180,9 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
         while(current != null){
             pai = current;
             if (chave < (int) current.getElement()) {
-                current = (NoRN) current.getLeftChild();
+                current = getLeftNo(current);
             } else {
-                current = (NoRN) current.getRightChild();
+                current = getRightNo(current);
             }
         }
 
@@ -158,7 +200,145 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
     }
     @Override
     public void remove(int chave){
-        NoRN node = (NoRN) search(chave);
+        NoRN noRemovido = (NoRN) search(chave);
+        if (noRemovido == null) {
+            return;
+        }
+
+        NoRN noSubstituto = noRemovido;
+        String corOriginal = getColor(noSubstituto);
+        NoRN noAjuste;
+        NoRN paiNoAjuste;
+        boolean ajusteEhFilhoEsquerdo;
+
+        if (getLeftNo(noRemovido) == null) {
+            noAjuste = getRightNo(noRemovido);
+            paiNoAjuste = (NoRN) noRemovido.getParent();
+            ajusteEhFilhoEsquerdo = paiNoAjuste != null && noRemovido == paiNoAjuste.getLeftChild();
+            transplantar(noRemovido, noAjuste);
+        } else if (getRightNo(noRemovido) == null) {
+            noAjuste = getLeftNo(noRemovido);
+            paiNoAjuste = (NoRN) noRemovido.getParent();
+            ajusteEhFilhoEsquerdo = paiNoAjuste != null && noRemovido == paiNoAjuste.getLeftChild();
+            transplantar(noRemovido, noAjuste);
+        } else {
+            noSubstituto = getMin(getRightNo(noRemovido));
+            corOriginal = getColor(noSubstituto);
+            noAjuste = getRightNo(noSubstituto);
+
+            if (noSubstituto.getParent() == noRemovido) {
+                paiNoAjuste = noSubstituto;
+                ajusteEhFilhoEsquerdo = false;
+            } else {
+                paiNoAjuste = (NoRN) noSubstituto.getParent();
+                ajusteEhFilhoEsquerdo = paiNoAjuste != null && noSubstituto == paiNoAjuste.getLeftChild();
+                transplantar(noSubstituto, noAjuste);
+                noSubstituto.setRightChild(getRightNo(noRemovido));
+            }
+
+            transplantar(noRemovido, noSubstituto);
+            noSubstituto.setLeftChild(getLeftNo(noRemovido));
+            noSubstituto.setColor(getColor(noRemovido));
+        }
+
+        size--;
+
+        if ("P".equals(corOriginal)) {
+            rebalanceRemocao(noAjuste, paiNoAjuste, ajusteEhFilhoEsquerdo);
+        }
+
+        if (root != null) {
+            setColor((NoRN) root, "P");
+        }
+    }
+
+    public NoRN rebalanceRemocao(NoRN no, NoRN pai, boolean noEhFilhoEsquerdo) {
+        while (no != root && "P".equals(getColor(no))) {
+            if (pai == null) {
+                break;
+            }
+
+            boolean ehEsquerdo;
+            if (no != null) {
+                ehEsquerdo = no == pai.getLeftChild();
+            } else {
+                ehEsquerdo = noEhFilhoEsquerdo;
+            }
+
+            if (ehEsquerdo) {
+                NoRN irmao = getRightNo(pai);
+
+                if (isRed(irmao)) {
+                    setColor(irmao, "P");
+                    setColor(pai, "V");
+                    RSE(pai);
+                    irmao = getRightNo(pai);
+                }
+
+                if ("P".equals(getColor(getLeftNo(irmao)))
+                    && "P".equals(getColor(getRightNo(irmao)))) {
+                    setColor(irmao, "V");
+                    no = pai;
+                    pai = (NoRN) no.getParent();
+                    noEhFilhoEsquerdo = pai != null && no == pai.getLeftChild();
+                } else {
+                    if ("P".equals(getColor(getRightNo(irmao)))) {
+                        setColor(getLeftNo(irmao), "P");
+                        setColor(irmao, "V");
+                        if (irmao != null) {
+                            RSD(irmao);
+                        }
+                        irmao = getRightNo(pai);
+                    }
+
+                    setColor(irmao, getColor(pai));
+                    setColor(pai, "P");
+                    setColor(getRightNo(irmao), "P");
+                    RSE(pai);
+                    no = (NoRN) root;
+                    pai = null;
+                }
+            } else {
+                NoRN irmao = getLeftNo(pai);
+
+                if (isRed(irmao)) {
+                    setColor(irmao, "P");
+                    setColor(pai, "V");
+                    RSD(pai);
+                    irmao = getLeftNo(pai);
+                }
+
+                if ("P".equals(getColor(getLeftNo(irmao)))
+                    && "P".equals(getColor(getRightNo(irmao)))) {
+                    setColor(irmao, "V");
+                    no = pai;
+                    pai = (NoRN) no.getParent();
+                    noEhFilhoEsquerdo = pai != null && no == pai.getLeftChild();
+                } else {
+                    if ("P".equals(getColor(getLeftNo(irmao)))) {
+                        setColor(getRightNo(irmao), "P");
+                        setColor(irmao, "V");
+                        if (irmao != null) {
+                            RSE(irmao);
+                        }
+                        irmao = getLeftNo(pai);
+                    }
+
+                    setColor(irmao, getColor(pai));
+                    setColor(pai, "P");
+                    setColor(getLeftNo(irmao), "P");
+                    RSD(pai);
+                    no = (NoRN) root;
+                    pai = null;
+                }
+            }
+        }
+
+        setColor(no, "P");
+        if (root != null) {
+            setColor((NoRN) root, "P");
+        }
+        return no;
     }
 
     @Override
@@ -166,7 +346,7 @@ public class ArvoreRubroNegra extends ArvoreBinaria {
                                    int coluna, int alturaRestante) {
         if (no == null) return;
         NoRN node = (NoRN) no;
-        if ("V".equals(node.getColor())) {
+        if ("V".equals(getColor(node))) {
             matriz[nivel][coluna] = String.format("%6s", node.getElement() + "[V]");
         } else {
             matriz[nivel][coluna] = String.format("%6s", node.getElement() + "[P]");
