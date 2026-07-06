@@ -1,77 +1,88 @@
 package grafo;
+
 import java.util.*;
 
-public class AEstrela{
+public class AEstrela {
 
-   public interface Heuristica {
-        Integer estimar(Vertice v, Vertice fim);
+    // Heuristica de Manhattan: distancia em linha reta sem diagonais
+    private static int heuristica(Celula a, Celula b) {
+        return Math.abs(a.linha - b.linha) + Math.abs(a.coluna - b.coluna);
     }
- 
-    public static void calcular(Grafo g, Vertice inicio, Vertice fim, Heuristica heuristica) {
-        Map<Vertice, Integer>  gCusto  = new HashMap<>();
-        Map<Vertice, Integer>  fCusto  = new HashMap<>();
-        Map<Vertice, Vertice> prev    = new HashMap<>();
-        Map<Vertice, Aresta>  prevA   = new HashMap<>();
-        Set<Vertice>          fechado = new HashSet<>();
-        List<String>          ordemVisita = new ArrayList<>();
- 
-        for (Vertice v : g.vertices()) {
-            gCusto.put(v, Integer.MAX_VALUE);
-            fCusto.put(v, Integer.MAX_VALUE);
-        }
+
+    public static List<Celula> calcular(Labirinto lab) {
+        Celula inicio = lab.getPartida();
+        Celula fim    = lab.getSaida();
+
+        Map<Celula, Integer> gCusto = new HashMap<>();
+        Map<Celula, Integer> fCusto = new HashMap<>();
+        Map<Celula, Celula>  prev   = new HashMap<>();
+        Set<Celula>          fechado     = new HashSet<>();
+        List<Celula>         ordemVisita = new ArrayList<>();
+
         gCusto.put(inicio, 0);
-        fCusto.put(inicio, heuristica.estimar(inicio, fim));
- 
-        PriorityQueue<Vertice> aberto = new PriorityQueue<>(
-                Comparator.comparingDouble(v -> fCusto.get(v))
+        fCusto.put(inicio, heuristica(inicio, fim));
+
+        PriorityQueue<Celula> aberto = new PriorityQueue<>(
+                Comparator.comparingInt(c -> fCusto.getOrDefault(c, Integer.MAX_VALUE))
         );
         aberto.add(inicio);
- 
+
         long tempoInicio = System.nanoTime();
- 
+
         while (!aberto.isEmpty()) {
-            Vertice u = aberto.poll();
+            Celula u = aberto.poll();
             if (fechado.contains(u)) continue;
             fechado.add(u);
-            ordemVisita.add(u.getValor().toString());
+            ordemVisita.add(u);
+
             if (u.equals(fim)) break;
- 
-            for (Aresta a : g.arestasIncidentes(u)) {
-                Vertice w = g.oposto(u, a);
+
+            for (Celula w : lab.vizinhos(u)) {
                 if (fechado.contains(w)) continue;
-                int novoG = gCusto.get(u) + ((Number) a.getValor()).intValue();
-                if (novoG < gCusto.get(w)) {
+                int novoG = gCusto.getOrDefault(u, Integer.MAX_VALUE) + 1;
+                if (novoG < gCusto.getOrDefault(w, Integer.MAX_VALUE)) {
                     gCusto.put(w, novoG);
-                    fCusto.put(w, novoG + heuristica.estimar(w, fim));
+                    fCusto.put(w, novoG + heuristica(w, fim));
                     prev.put(w, u);
-                    prevA.put(w, a);
                     aberto.add(w);
                 }
             }
         }
- 
+
         long tempoFim = System.nanoTime();
- 
-        System.out.println("|           ALGORITMO A* (A-estrela)           |");
- 
-        if (gCusto.get(fim) == Double.MAX_VALUE) {
-            System.out.println("  Sem caminho entre " + inicio.getValor() + " e " + fim.getValor() + ".");
-        } else {
-            LinkedList<String> caminho = new LinkedList<>();
-            Vertice cur = fim;
-            while (cur != null && !cur.equals(inicio)) {
-                Aresta a = prevA.get(cur);
-                caminho.addFirst(cur.getValor() + "(+" + a.getValor() + ")");
+
+        // Reconstrói caminho
+        List<Celula> caminho = new ArrayList<>();
+        if (gCusto.containsKey(fim)) {
+            Celula cur = fim;
+            while (cur != null) {
+                caminho.add(0, cur);
                 cur = prev.get(cur);
             }
-            caminho.addFirst(inicio.getValor().toString());
- 
-            System.out.println("  Visitados : " + String.join(" -> ", ordemVisita));
-            System.out.println("  Caminho   : " + String.join(" -> ", caminho));
-            System.out.println("  Custo     : " + gCusto.get(fim).intValue());
         }
- 
+
+        System.out.println("|           ALGORITMO A* (A-estrela)           |");
+
+        if (caminho.isEmpty()) {
+            System.out.println("  Sem caminho encontrado.");
+        } else {
+            System.out.println("  Heuristica: distancia de Manhattan");
+            System.out.println("  Visitados : " + ordemVisita.size() + " celulas");
+            System.out.print  ("  Caminho   : ");
+            for (int i = 0; i < caminho.size(); i++) {
+                Celula c = caminho.get(i);
+                System.out.print(c);
+                if (i < caminho.size() - 1) System.out.print(" -> ");
+            }
+            System.out.println();
+            System.out.println("  Passos    : " + (caminho.size() - 1));
+        }
+
         System.out.printf("  Tempo     : %.4f ms%n", (tempoFim - tempoInicio) / 1_000_000.0);
         System.out.println("================================================");
+
+        lab.imprimirComCaminho(caminho);
+
+        return caminho;
     }
 }

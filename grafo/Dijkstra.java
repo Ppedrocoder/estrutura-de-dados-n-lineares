@@ -1,70 +1,79 @@
 package grafo;
 
-
 import java.util.*;
 
 public class Dijkstra {
 
-    public static void calcular(Grafo g, Vertice inicio, Vertice fim) {
-        Map<Vertice, Double>  dist  = new HashMap<>();
-        Map<Vertice, Vertice> prev  = new HashMap<>();
-        Map<Vertice, Aresta>  prevA = new HashMap<>();
-        Set<Vertice>          visitados = new HashSet<>();
-        List<String>          ordemVisita = new ArrayList<>();
- 
-        for (Vertice v : g.vertices())
-            dist.put(v, Double.MAX_VALUE);
-        dist.put(inicio, 0.0);
- 
-        PriorityQueue<Vertice> fila = new PriorityQueue<>(
-                Comparator.comparingDouble(v -> dist.get(v))
+    public static List<Celula> calcular(Labirinto lab) {
+        Celula inicio = lab.getPartida();
+        Celula fim    = lab.getSaida();
+
+        Map<Celula, Integer> dist  = new HashMap<>();
+        Map<Celula, Celula>  prev  = new HashMap<>();
+        Set<Celula>          visitados   = new HashSet<>();
+        List<Celula>         ordemVisita = new ArrayList<>();
+
+        dist.put(inicio, 0);
+
+        PriorityQueue<Celula> fila = new PriorityQueue<>(
+                Comparator.comparingInt(c -> dist.getOrDefault(c, Integer.MAX_VALUE))
         );
         fila.add(inicio);
- 
+
         long tempoInicio = System.nanoTime();
- 
+
         while (!fila.isEmpty()) {
-            Vertice u = fila.poll();
+            Celula u = fila.poll();
             if (visitados.contains(u)) continue;
             visitados.add(u);
-            ordemVisita.add(u.getValor().toString());
+            ordemVisita.add(u);
+
             if (u.equals(fim)) break;
- 
-            for (Aresta a : g.arestasIncidentes(u)) {
-                Vertice w = g.oposto(u, a);
+
+            for (Celula w : lab.vizinhos(u)) {
                 if (visitados.contains(w)) continue;
-                double novaDist = dist.get(u) + ((Number) a.getValor()).doubleValue();
-                if (novaDist < dist.get(w)) {
+                int novaDist = dist.getOrDefault(u, Integer.MAX_VALUE) + 1;
+                if (novaDist < dist.getOrDefault(w, Integer.MAX_VALUE)) {
                     dist.put(w, novaDist);
                     prev.put(w, u);
-                    prevA.put(w, a);
                     fila.add(w);
                 }
             }
         }
- 
+
         long tempoFim = System.nanoTime();
 
-        System.out.println("|           ALGORITMO DE DIJKSTRA              |");
- 
-        if (dist.get(fim) == Double.MAX_VALUE) {
-            System.out.println("  Sem caminho entre " + inicio.getValor() + " e " + fim.getValor() + ".");
-        } else {
-            LinkedList<String> caminho = new LinkedList<>();
-            Vertice cur = fim;
-            while (cur != null && !cur.equals(inicio)) {
-                Aresta a = prevA.get(cur);
-                caminho.addFirst(cur.getValor() + "(+" + a.getValor() + ")");
+        // Reconstrói caminho
+        List<Celula> caminho = new ArrayList<>();
+        if (dist.containsKey(fim)) {
+            Celula cur = fim;
+            while (cur != null) {
+                caminho.add(0, cur);
                 cur = prev.get(cur);
             }
-            caminho.addFirst(inicio.getValor().toString());
- 
-            System.out.println("  Visitados : " + String.join(" -> ", ordemVisita));
-            System.out.println("  Caminho   : " + String.join(" -> ", caminho));
-            System.out.println("  Custo     : " + dist.get(fim).intValue());
         }
- 
+
+        System.out.println("|           ALGORITMO DE DIJKSTRA              |");
+
+        if (caminho.isEmpty()) {
+            System.out.println("  Sem caminho encontrado.");
+        } else {
+            System.out.println("  Visitados : " + ordemVisita.size() + " celulas");
+            System.out.print  ("  Caminho   : ");
+            for (int i = 0; i < caminho.size(); i++) {
+                Celula c = caminho.get(i);
+                System.out.print(c);
+                if (i < caminho.size() - 1) System.out.print(" -> ");
+            }
+            System.out.println();
+            System.out.println("  Passos    : " + (caminho.size() - 1));
+        }
+
         System.out.printf("  Tempo     : %.4f ms%n", (tempoFim - tempoInicio) / 1_000_000.0);
         System.out.println("================================================");
+
+        lab.imprimirComCaminho(caminho);
+
+        return caminho;
     }
 }
